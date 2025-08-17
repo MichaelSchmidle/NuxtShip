@@ -8,13 +8,12 @@ async function hasUncommittedChanges(): Promise<boolean> {
   try {
     // Check for uncommitted changes to files we would modify
     const result = execSync(
-      'git status --porcelain package.json deployment/scripts/cleanup-template.ts 2>/dev/null',
-      { encoding: 'utf-8' }
+      'git status --porcelain package.json deployment/scripts/cleanup-template.ts',
+      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }
     )
     
     if (result.trim()) {
       console.log('⚠️  Uncommitted changes detected - skipping cleanup to protect your work')
-      console.log('   Commit or stash your changes first if you want to run cleanup')
       return true
     }
     return false
@@ -28,8 +27,6 @@ async function cleanupTemplateCommands(): Promise<void> {
   const packageJsonPath = join(process.cwd(), 'package.json')
   
   try {
-    console.log('🧹 Cleaning up template commands...')
-    
     // Read current package.json
     const packageContent = await readFile(packageJsonPath, 'utf-8')
     const packageJson = JSON.parse(packageContent)
@@ -58,30 +55,13 @@ async function cleanupTemplateCommands(): Promise<void> {
       }
     })
     
-    // Rename container commands to be more user-friendly
-    const renames = {
-      'containers:start': 'infra:start',
-      'containers:stop': 'infra:stop',
-      'containers:restart': 'infra:restart',
-      'containers:logs': 'infra:logs',
-      'containers:status': 'infra:status'
-    }
-    
-    Object.entries(renames).forEach(([oldName, newName]) => {
-      if (scripts[oldName]) {
-        scripts[newName] = scripts[oldName]
-        delete scripts[oldName]
-      }
-    })
+    // No renaming needed - commands are already named correctly
     
     // Update package.json
     packageJson.scripts = scripts
     
     // Write back to file
     await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n')
-    
-    console.log(`✅ Cleaned up ${removedCount} template commands`)
-    console.log('📝 Renamed container commands to infra:* pattern')
     
   } catch (error) {
     console.error('❌ Failed to cleanup template commands:', error.message)

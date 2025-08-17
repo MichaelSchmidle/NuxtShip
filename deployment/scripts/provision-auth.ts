@@ -361,8 +361,8 @@ Possible causes:
 • Certificate issues
 
 Troubleshooting:
-1. Check container status: bun run containers:status
-2. View container logs: bun run containers:logs zitadel
+1. Check container status: bun run infra:status
+2. View container logs: bun run infra:logs zitadel
 3. Test connectivity: curl ${this.config.apiUrl}/debug/ready
 
 Once resolved, resume provisioning with:
