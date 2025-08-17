@@ -336,7 +336,7 @@ class ZitadelProvisioner {
 
   async waitForZitadel(): Promise<void> {
     console.log('⏳ Waiting for Zitadel to be ready...')
-    const maxRetries = 60
+    const maxRetries = 30
     const retryInterval = 2000 // 2 seconds
 
     // First wait for basic health check
@@ -351,7 +351,24 @@ class ZitadelProvisioner {
       }
 
       if (i === maxRetries - 1) {
-        throw new Error('Timeout waiting for Zitadel health check')
+        console.error(`\n❌ Unable to connect to Zitadel at ${this.config.apiUrl}/debug/ready after ${maxRetries * retryInterval / 1000} seconds.
+
+Possible causes:
+• Network connectivity issues
+• DNS resolution not working (check if ${this.config.domain} resolves)
+• Zitadel container still starting up  
+• Firewall or proxy blocking the connection
+• Certificate issues
+
+Troubleshooting:
+1. Check container status: bun run containers:status
+2. View container logs: bun run containers:logs zitadel
+3. Test connectivity: curl ${this.config.apiUrl}/debug/ready
+
+Once resolved, resume provisioning with:
+  bun run setup:auth:provision
+`)
+        process.exit(1)
       }
 
       process.stdout.write('.')
@@ -636,6 +653,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('❌ Error:', error.message)
+  console.error('❌ Provisioning failed')
   process.exit(1)
 })

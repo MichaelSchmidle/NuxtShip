@@ -20,6 +20,7 @@
     "setup:containers": "docker compose --env-file .env -f deployment/docker-compose.yml -f deployment/docker-compose.dev.yml up -d",
     "setup:database": "bun run db:generate && bun run db:migrate",
     "setup:auth": "NODE_EXTRA_CA_CERTS=\"$(mkcert -CAROOT)/rootCA.pem\" bun run deployment/scripts/provision-auth.ts",
+    "setup:auth:provision": "NODE_EXTRA_CA_CERTS=\"$(mkcert -CAROOT)/rootCA.pem\" bun run deployment/scripts/provision-auth.ts",
     "containers:start": "docker compose --env-file .env -f deployment/docker-compose.yml -f deployment/docker-compose.dev.yml up -d",
     "containers:stop": "docker compose --env-file .env -f deployment/docker-compose.yml -f deployment/docker-compose.dev.yml down",
     "containers:restart": "docker compose --env-file .env -f deployment/docker-compose.yml -f deployment/docker-compose.dev.yml restart",
