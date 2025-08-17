@@ -1,0 +1,33 @@
+# Nuxt dev server directory
+.nuxt/
+.nitro/
+.cache/
+.output/
+.env
+.data/
+
+# Node dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.devcontainer/
+.DS_Store
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Database
+server/database/migrations/
+
+# Generated certificates
+deployment/traefik/certs/
+
+# Zitadel generated files
+deployment/zitadel/machinekey/
+deployment/zitadel/pat/

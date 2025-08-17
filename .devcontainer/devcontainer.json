@@ -1,0 +1,50 @@
+{
+  "name": "Nuxt Development Environment",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "nuxt-dev",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-vscode-remote.remote-containers"
+      ],
+      "settings": {
+        "typescript.preferences.includePackageJsonAutoImports": "on",
+        "vue.server.hybridMode": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "tailwindCSS.experimental.classRegex": [
+          ["ui:\\s*{([^)]*)\\s*}", "[\"'`]([^\"'`]*).*?[\"'`]"]
+        ]
+      }
+    }
+  },
+  "postCreateCommand": "bun install",
+  "forwardPorts": [3000, 443, 80],
+  "portsAttributes": {
+    "3000": {
+      "label": "Nuxt Dev Server",
+      "onAutoForward": "notify"
+    },
+    "443": {
+      "label": "HTTPS (Traefik)",
+      "onAutoForward": "silent"
+    },
+    "80": {
+      "label": "HTTP (Traefik)",
+      "onAutoForward": "silent"
+    }
+  },
+  "remoteUser": "node"
+}
