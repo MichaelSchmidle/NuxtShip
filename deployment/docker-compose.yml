@@ -1,6 +1,8 @@
+name: ${PROJECT_NAME}
+
 services:
   traefik:
-    image: traefik:v3.4.4
+    image: traefik:${TRAEFIK_VERSION:-v3.4.4}
     container_name: app-traefik
     restart: unless-stopped
     ports:
@@ -30,7 +32,7 @@ services:
 
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:v3.3.1
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION:-v3.3.1}
     container_name: app-zitadel
     command: 'start-from-init --masterkey "${ZITADEL_MASTERKEY}" --steps /config/init-steps.yaml'
     environment:
@@ -98,7 +100,7 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: postgres:17-alpine
+    image: postgres:${POSTGRES_VERSION:-17-alpine}
     container_name: app-postgres
     environment:
       # Primary app database (PostgreSQL native creation)

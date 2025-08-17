@@ -17,7 +17,7 @@ Get enterprise-grade authentication, user management, and database security out 
 
 ```bash
 # 1. Create your project
-bun x nuxi init my-awesome-app -t github:MichaelSchmidle/nuxtship
+bun x nuxi init -t github:MichaelSchmidle/NuxtShip my-awesome-app
 
 # 2. Configure (see .env.example for details)
 cd my-awesome-app

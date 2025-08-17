@@ -23,7 +23,7 @@ node_modules/
 *.log
 
 # Database
-server/database/migrations/
+# Note: migrations/ should be included in template for initial schema
 
 # Generated certificates
 deployment/traefik/certs/

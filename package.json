@@ -1,7 +1,7 @@
 {
   "name": "nuxtship",
-  "version": "1.0.0",
-  "description": "Production-ready Nuxt development environment with Docker, Traefik, Zitadel, and PostgreSQL",
+  "version": "0.2.0",
+  "description": "Production-ready Nuxt template with authentication, user management, and database security out of the box. Skip the auth boilerplate and ship faster.",
   "private": true,
   "type": "module",
   "scripts": {
