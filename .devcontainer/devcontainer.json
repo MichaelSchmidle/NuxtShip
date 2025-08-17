@@ -1,7 +1,7 @@
 {
   "name": "Nuxt Development Environment",
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "nuxt-dev",
+  "dockerComposeFile": ["../deployment/docker-compose.yml", "../deployment/docker-compose.dev.yml"],
+  "service": "app",
   "workspaceFolder": "/workspace",
   "features": {
     "ghcr.io/devcontainers/features/git:1": {},
