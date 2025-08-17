@@ -1,6 +1,6 @@
 {
   "name": "nuxtship",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Production-ready Nuxt template with authentication, user management, and database security out of the box. Skip the auth boilerplate and ship faster.",
   "private": true,
   "type": "module",
