@@ -7,7 +7,7 @@
  */
 import { sql } from 'drizzle-orm'
 import { db } from '../utils/db'
-import { getUserSession } from '../utils/auth'
+import { getAuthSession } from '../utils/auth'
 
 export default defineEventHandler(async (event) => {
   // Only apply to API routes
@@ -17,8 +17,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Get user from OIDC session using nuxt-oidc-auth
-    const session = await getUserSession(event)
-    const userId = session?.user?.sub
+    const session = await getAuthSession(event)
+    const userId = session?.userInfo?.sub as string | undefined
 
     if (userId) {
       // Set the user ID in PostgreSQL session for RLS
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
       
       // Store in event context for use in API routes
       event.context.userId = userId
-      event.context.user = session.user
+      event.context.user = session.userInfo
     }
   } catch (error) {
     // Log but don't fail - some routes might be public

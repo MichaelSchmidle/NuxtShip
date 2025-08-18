@@ -4,16 +4,16 @@
  * Provides helper functions to get user session data from nuxt-oidc-auth
  */
 import type { H3Event } from 'h3'
-// @ts-expect-error - Module types not available
-import { getUserSession as getOidcUserSession } from 'nuxt-oidc-auth/runtime/server/utils/session.mjs'
 
 /**
  * Get user session from the event context
- * Wrapper around nuxt-oidc-auth's getUserSession
+ * Note: This function dynamically imports getUserSession to avoid build-time issues
  */
-export async function getUserSession(event: H3Event) {
+export async function getAuthSession(event: H3Event) {
   try {
-    const session = await getOidcUserSession(event)
+    // Dynamic import using the correct export path
+    const sessionModule = await import('nuxt-oidc-auth/runtime/server/utils/session.js')
+    const session = await sessionModule.getUserSession(event)
     return session
   } catch {
     return null
