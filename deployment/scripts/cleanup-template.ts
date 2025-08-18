@@ -107,6 +107,18 @@ async function cleanupReadme(): Promise<void> {
       ''
     )
     
+    // Remove License section (users choose their own license)
+    readme = readme.replace(
+      /## 📝 License[\s\S]*?(?=## |---\n|$)/,
+      ''
+    )
+    
+    // Update directory structure to use project name instead of "my-awesome-app"
+    readme = readme.replace(
+      /my-awesome-app\//g,
+      `${projectName.toLowerCase().replace(/\s+/g, '-')}/`
+    )
+    
     // Update footer attribution
     readme = readme.replace(
       'Made with ❤️ and',

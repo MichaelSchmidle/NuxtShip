@@ -4,7 +4,7 @@
 
 Get enterprise-grade authentication, user management, and database security out of the box. No more coding login flows, password resets, or user profiles. Focus on the unique business logic of your app while standing on the shoulders of giants.
 
-## ✨ What You Get
+## ✨ What You Get with NuxtShip
 
 - **🔐 Complete Authentication**: Login, logout, password reset, user profiles
 - **👤 User Management**: Add, remove, edit users for your app
@@ -43,6 +43,7 @@ bun run dev          # Local Nuxt development with containerized infrastructure
 ```
 
 This approach gives you the best of both worlds:
+
 - **Fast development** - Native Node.js performance, instant hot reload
 - **Consistent infrastructure** - Database, authentication, and proxy services run in containers
 - **No "works on my machine"** - Infrastructure is identical across all environments
