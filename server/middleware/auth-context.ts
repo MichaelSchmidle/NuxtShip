@@ -1,5 +1,5 @@
 /**
- * Example middleware to set user context for Row Level Security
+ * Middleware to set user context for Row Level Security
  * 
  * This middleware extracts the user ID from the OIDC session
  * and sets it as a PostgreSQL session variable that RLS policies
@@ -7,6 +7,7 @@
  */
 import { sql } from 'drizzle-orm'
 import { db } from '../utils/db'
+import { getUserSession } from '../utils/auth'
 
 export default defineEventHandler(async (event) => {
   // Only apply to API routes
@@ -15,16 +16,17 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Get user from OIDC session
+    // Get user from OIDC session using nuxt-oidc-auth
     const session = await getUserSession(event)
     const userId = session?.user?.sub
 
     if (userId) {
       // Set the user ID in PostgreSQL session for RLS
-      await db.execute(sql`SET LOCAL app.user_id = ${userId}`)
+      await db.execute(sql`SET LOCAL auth.user_id = ${userId}`)
       
       // Store in event context for use in API routes
       event.context.userId = userId
+      event.context.user = session.user
     }
   } catch (error) {
     // Log but don't fail - some routes might be public

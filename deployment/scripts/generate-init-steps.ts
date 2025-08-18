@@ -27,7 +27,7 @@ async function loadEnvVariables(): Promise<Record<string, string>> {
     }
     
     return env
-  } catch (error) {
+  } catch {
     throw new Error('.env file not found. Run `bun run setup:env` first.')
   }
 }

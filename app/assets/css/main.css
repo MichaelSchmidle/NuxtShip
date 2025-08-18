@@ -1,1 +1,3 @@
-@import '@nuxt/ui-pro/assets/css/main.css';
+@import "tailwindcss";
+@import "@nuxt/ui-pro";
+@plugin "@tailwindcss/typography";

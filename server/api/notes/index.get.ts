@@ -5,6 +5,7 @@
  * belonging to the authenticated user thanks to RLS policies
  */
 import { db } from '../../utils/db'
+import { getUserSession } from '../../utils/auth'
 import { notes } from '../../database/schema/notes'
 
 export default defineEventHandler(async (event) => {
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
       notes: userNotes,
       count: userNotes.length
     }
-  } catch (error) {
+  } catch {
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to fetch notes'

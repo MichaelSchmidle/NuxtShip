@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { writeFileSync, readFileSync, existsSync } from "fs"
+import { writeFileSync } from "fs"
 import { join } from "path"
 
 async function main() {

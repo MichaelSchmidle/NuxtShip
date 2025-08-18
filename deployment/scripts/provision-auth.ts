@@ -49,7 +49,7 @@ class ZitadelProvisioner {
         this.machineKey = JSON.parse(machineKeyContent)
         // Service account loaded successfully
         return
-      } catch (error) {
+      } catch {
         // Try next path
       }
     }
@@ -86,7 +86,7 @@ class ZitadelProvisioner {
         this.accessToken = pat.trim()
         // Using PAT for authentication
         return
-      } catch (error) {
+      } catch {
         // Try next path
       }
     }
@@ -184,7 +184,7 @@ class ZitadelProvisioner {
     return result.id
   }
 
-  async findApplication(projectId: string): Promise<any | null> {
+  async findApplication(projectId: string): Promise<unknown | null> {
     if (!this.accessToken) {
       throw new Error('Not authenticated')
     }
@@ -312,7 +312,7 @@ class ZitadelProvisioner {
     let envContent = ''
     try {
       envContent = await readFile(envPath, 'utf-8')
-    } catch (error) {
+    } catch {
       throw new Error(
         '.env file not found. Please create one from .env.example first.'
       )
@@ -346,7 +346,7 @@ class ZitadelProvisioner {
         if (response.ok) {
           break
         }
-      } catch (error) {
+      } catch {
         // Expected to fail while starting up
       }
 
@@ -403,7 +403,7 @@ Once resolved, resume provisioning with:
           console.log(' Ready!')
           return
         }
-      } catch (error) {
+      } catch {
         // Expected to fail while API is starting up
       }
 
@@ -577,7 +577,7 @@ Once resolved, resume provisioning with:
 
     // Get project configuration from environment
     const projectName = process.env.PROJECT_NAME || 'myapp'
-    const applicationName =
+    const _applicationName =
       process.env.PROJECT_DISPLAY_NAME || `${projectName} Web App`
 
     try {
@@ -600,7 +600,7 @@ Once resolved, resume provisioning with:
       await this.configureExternalLink()
 
       console.log('\n✅ Provisioning completed successfully!')
-    } catch (error) {
+    } catch {
       console.error('\n❌ Provisioning failed:', error)
       process.exit(1)
     }
@@ -652,7 +652,7 @@ async function main() {
   await provisioner.provision()
 }
 
-main().catch((error) => {
+main().catch(() => {
   console.error('❌ Provisioning failed')
   process.exit(1)
 })

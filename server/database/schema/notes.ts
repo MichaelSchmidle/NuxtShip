@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, pgPolicy } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
 /**
@@ -29,13 +29,16 @@ export const notes = pgTable('notes', {
  * from the OIDC token in your auth middleware.
  */
 export const notesRLSPolicies = sql`
+  -- Create auth schema if it doesn't exist
+  CREATE SCHEMA IF NOT EXISTS auth;
+  
   -- Enable RLS on the notes table
   ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
   
   -- Create function to get current user ID from session
   CREATE OR REPLACE FUNCTION auth.user_id() 
   RETURNS TEXT AS $$
-    SELECT current_setting('app.user_id', true)::TEXT;
+    SELECT current_setting('auth.user_id', true)::TEXT;
   $$ LANGUAGE SQL STABLE;
   
   -- Policy: Users can only see their own notes

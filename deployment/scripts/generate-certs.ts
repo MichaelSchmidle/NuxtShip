@@ -46,7 +46,7 @@ async function main() {
   // Install the local CA if not already done
   try {
     await $`mkcert -install`.quiet()
-  } catch (error) {
+  } catch {
     console.error("⚠️  Warning: Failed to install local CA. You may need to run with elevated privileges.")
     console.error("   On Windows: Run as Administrator")
     console.error("   On macOS/Linux: You may be prompted for your password")
@@ -59,8 +59,8 @@ async function main() {
 
   // Get domains from environment or use localhost defaults
   const appDomain = process.env.APP_DOMAIN || 'app.localhost'
-  const authDomain = process.env.AUTH_DOMAIN || 'auth.localhost'
-  const proxyDomain = process.env.PROXY_DOMAIN || 'proxy.localhost'
+  const _authDomain = process.env.AUTH_DOMAIN || 'auth.localhost'
+  const _proxyDomain = process.env.PROXY_DOMAIN || 'proxy.localhost'
   
   // Extract base domain (e.g., 'localhost' from 'app.localhost')
   const baseDomain = appDomain.split('.').slice(1).join('.') || 'localhost'

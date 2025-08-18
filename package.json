@@ -1,6 +1,6 @@
 {
   "name": "nuxtship",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Production-ready Nuxt template with authentication, user management, and database security out of the box. Skip the auth boilerplate and ship faster.",
   "private": true,
   "type": "module",
@@ -51,6 +51,7 @@
   "devDependencies": {
     "@iconify-json/ph": "^1.2.2",
     "@nuxt/eslint": "^1.8.0",
+    "@tailwindcss/typography": "^0.5.16",
     "drizzle-kit": "^0.31.4",
     "typescript": "^5.9.2",
     "vue-tsc": "^3.0.5"

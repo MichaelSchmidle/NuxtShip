@@ -17,7 +17,7 @@ Get enterprise-grade authentication, user management, and database security out 
 
 ```bash
 # 1. Create your project
-bun x nuxi init -t github:MichaelSchmidle/NuxtShip my-awesome-app
+bun x nuxi init -t github:MichaelSchmidle/NuxtShip@latest my-awesome-app
 
 # 2. Configure (see .env.example for details)
 cd my-awesome-app
@@ -88,9 +88,9 @@ my-awesome-app/
 
 After setup:
 
-- **`https://app.localhost`**: Your application
-- **`https://auth.localhost`**: Authentication provider
-- **`https://proxy.localhost:8080`**: Traefik dashboard (dev)
+- **`https://app.localhost`** (or your custom app domain): Your application
+- **`https://auth.localhost`** (or your custom auth domain): Authentication provider
+- **`https://proxy.localhost:8080`** (or your custom proxy domain): Traefik dashboard
 
 ## 🧪 Quality Tools
 

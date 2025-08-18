@@ -1,8 +1,7 @@
 #!/usr/bin/env bun
 
-import { readFile, writeFile } from 'fs/promises'
+import { readFile, writeFile, unlink } from 'fs/promises'
 import { join } from 'path'
-import { execSync } from 'child_process'
 
 async function isTemplateRepo(): Promise<boolean> {
   const packageJsonPath = join(process.cwd(), 'package.json')
@@ -51,11 +50,12 @@ async function cleanupTemplateCommands(): Promise<void> {
       'setup:auth:provision'
     ]
     
-    let removedCount = 0
+    let _removedCount = 0
     commandsToRemove.forEach(cmd => {
       if (scripts[cmd]) {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete scripts[cmd]
-        removedCount++
+        _removedCount++
       }
     })
     
@@ -177,6 +177,17 @@ async function updatePackageInfo(): Promise<void> {
   }
 }
 
+async function cleanupLicense(): Promise<void> {
+  const licensePath = join(process.cwd(), 'LICENSE')
+  
+  try {
+    await unlink(licensePath)
+    console.log('🗑️  Removed template LICENSE - choose your own license')
+  } catch {
+    // File might not exist, that's fine
+  }
+}
+
 async function main(): Promise<void> {
   // First update package.json with project info
   // This changes the package name from "nuxtship" to the project name
@@ -189,6 +200,7 @@ async function main(): Promise<void> {
     // Only clean up if we're NOT in the template repo
     await cleanupTemplateCommands()
     await cleanupReadme()
+    await cleanupLicense()
     console.log('🚀 Your project is ready for development!')
   }
 }
