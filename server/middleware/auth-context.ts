@@ -22,7 +22,9 @@ export default defineEventHandler(async (event) => {
 
     if (userId) {
       // Set the user ID in PostgreSQL session for RLS
-      await db.execute(sql`SET LOCAL auth.user_id = ${userId}`)
+      // Use SET SESSION instead of SET LOCAL (doesn't require transaction)
+      // Use sql.raw because SET doesn't support parameterized queries
+      await db.execute(sql.raw(`SET SESSION auth.user_id = '${userId.replace(/'/g, "''")}'`))
       
       // Store in event context for use in API routes
       event.context.userId = userId
