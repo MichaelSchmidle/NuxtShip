@@ -4,21 +4,25 @@ import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { execSync } from 'child_process'
 
-async function hasUncommittedChanges(): Promise<boolean> {
+async function isTemplateRepo(): Promise<boolean> {
+  const packageJsonPath = join(process.cwd(), 'package.json')
+  
   try {
-    // Check for uncommitted changes to files we would modify
-    const result = execSync(
-      'git status --porcelain package.json deployment/scripts/cleanup-template.ts',
-      { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }
-    )
+    // Read current package.json to check if we're still in the template
+    const packageContent = await readFile(packageJsonPath, 'utf-8')
+    const packageJson = JSON.parse(packageContent)
     
-    if (result.trim()) {
-      console.log('⚠️  Uncommitted changes detected - skipping cleanup to protect your work')
+    // If package name is still "nuxtship", we're in the template repo
+    // (or user named their project identically - in which case, no harm in skipping cleanup)
+    if (packageJson.name === 'nuxtship') {
+      console.log('⚠️  Template repository detected - skipping cleanup to preserve template')
       return true
     }
+    
     return false
-  } catch {
-    // No git or not a git repo - safe to proceed (likely from nuxi init)
+  } catch (error) {
+    console.error('Failed to check if template repo:', error.message)
+    // If we can't read package.json, assume it's safe to proceed
     return false
   }
 }
@@ -69,6 +73,57 @@ async function cleanupTemplateCommands(): Promise<void> {
   }
 }
 
+async function cleanupReadme(): Promise<void> {
+  const readmePath = join(process.cwd(), 'README.md')
+  const envPath = join(process.cwd(), '.env')
+  
+  try {
+    // Get project name from .env
+    const envContent = await readFile(envPath, 'utf-8')
+    const projectNameMatch = envContent.match(/^PROJECT_NAME=(.*)$/m)
+    const appNameMatch = envContent.match(/^APPLICATION_NAME=(.*)$/m)
+    
+    const projectName = projectNameMatch?.[1]?.trim().replace(/['"]/g, '') || 'My App'
+    const appName = appNameMatch?.[1]?.trim().replace(/['"]/g, '') || projectName
+    
+    // Read current README
+    let readme = await readFile(readmePath, 'utf-8')
+    
+    // Replace title and tagline
+    readme = readme.replace(
+      /# 🚀 NuxtShip\n\n\*\*Skip the auth boilerplate\. Ship your idea faster\.\*\*/,
+      `# ${appName}\n\nBuilt with NuxtShip - Authentication and infrastructure included.`
+    )
+    
+    // Remove the entire Quick Start section (installation instructions)
+    readme = readme.replace(
+      /## 🚀 Quick Start[\s\S]*?(?=## |$)/,
+      ''
+    )
+    
+    // Remove Contributing section
+    readme = readme.replace(
+      /## 🤝 Contributing[\s\S]*?(?=## |---\n|$)/,
+      ''
+    )
+    
+    // Update footer attribution
+    readme = readme.replace(
+      'Made with ❤️ and',
+      'Built with NuxtShip and powered by'
+    )
+    
+    // Write updated README
+    await writeFile(readmePath, readme)
+    
+    console.log(`📝 Updated README.md for ${appName}`)
+    
+  } catch (error) {
+    console.error('❌ Failed to cleanup README:', error.message)
+    // Don't fail the entire init process
+  }
+}
+
 async function updatePackageInfo(): Promise<void> {
   const packageJsonPath = join(process.cwd(), 'package.json')
   const envPath = join(process.cwd(), '.env')
@@ -111,19 +166,17 @@ async function updatePackageInfo(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  // First check for uncommitted changes
-  const hasChanges = await hasUncommittedChanges()
-  
-  if (!hasChanges) {
-    // Clean up template commands FIRST (before any modifications)
-    await cleanupTemplateCommands()
-  }
-  
-  // Then update package.json with project info
-  // This happens regardless of cleanup
+  // First update package.json with project info
+  // This changes the package name from "nuxtship" to the project name
   await updatePackageInfo()
   
-  if (!hasChanges) {
+  // Then check if we're in the template repository
+  const isTemplate = await isTemplateRepo()
+  
+  if (!isTemplate) {
+    // Only clean up if we're NOT in the template repo
+    await cleanupTemplateCommands()
+    await cleanupReadme()
     console.log('🚀 Your project is ready for development!')
   }
 }
