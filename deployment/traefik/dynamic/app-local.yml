@@ -1,0 +1,19 @@
+# Dynamic configuration for local development
+# Routes app.localhost (and custom APP_DOMAIN) to local dev server
+http:
+  routers:
+    app-local-default:
+      rule: "Host(`app.localhost`)"
+      tls: true
+      service: app-local-service
+      entryPoints:
+        - websecure
+        
+    # Additional router for custom domains
+    # This will be dynamically generated during setup
+    
+  services:
+    app-local-service:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3000"

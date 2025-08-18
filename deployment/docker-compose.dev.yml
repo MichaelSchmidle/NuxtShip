@@ -1,26 +1,4 @@
 services:
-  app:
-    image: node:${NODE_VERSION:-20-alpine}
-    working_dir: /workspace
-    volumes:
-      - ../:/workspace
-      - node_modules:/workspace/node_modules
-    environment:
-      - NODE_ENV=development
-      - VERSION=${VERSION:-development}
-    command: sh -c "bun install && bun run dev:container"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.rule=Host(`${APP_DOMAIN}`)"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls=true"
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
-    networks:
-      - app
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   traefik:
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -62,8 +40,6 @@ services:
     ports:
       - "${POSTGRES_HOST_PORT:-5432}:5432"
 
-volumes:
-  node_modules:
 
 networks:
   app:

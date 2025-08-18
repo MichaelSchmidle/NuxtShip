@@ -38,17 +38,14 @@ Your app runs at `https://app.localhost` with full authentication ready. Use `.l
 
 ## 🛠️ Development
 
-### Container Development (Default)
-
 ```bash
-bun run dev          # Full container development
+bun run dev          # Local Nuxt development with containerized infrastructure
 ```
 
-### Local Development
-
-```bash
-bun run dev:local    # Local Nuxt + containerized infrastructure
-```
+This approach gives you the best of both worlds:
+- **Fast development** - Native Node.js performance, instant hot reload
+- **Consistent infrastructure** - Database, authentication, and proxy services run in containers
+- **No "works on my machine"** - Infrastructure is identical across all environments
 
 ## 🐳 Infrastructure Commands
 
