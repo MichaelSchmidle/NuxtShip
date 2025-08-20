@@ -34,38 +34,23 @@ async function cleanupTemplateCommands(): Promise<void> {
     const packageContent = await readFile(packageJsonPath, 'utf-8')
     const packageJson = JSON.parse(packageContent)
     
-    // Remove template-specific commands but keep runtime commands
+    // Update the init command to remove the cleanup step
     const scripts = packageJson.scripts || {}
     
-    // Commands to remove (template setup only)
-    const commandsToRemove = [
-      'init',
-      'setup:env',
-      'setup:full', 
-      'setup:certs',
-      'setup:init-steps',
-      'setup:containers',
-      'setup:database',
-      'setup:auth',
-      'setup:auth:provision'
-    ]
-    
-    let _removedCount = 0
-    commandsToRemove.forEach(cmd => {
-      if (scripts[cmd]) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete scripts[cmd]
-        _removedCount++
-      }
-    })
-    
-    // No renaming needed - commands are already named correctly
+    // Remove cleanup from init command
+    if (scripts.init) {
+      // Change from: "bun run setup:env && bun run setup:full && bun run deployment/scripts/cleanup-template.ts"
+      // To just: "bun run setup:env && bun run setup:full"
+      scripts.init = 'bun run setup:env && bun run setup:full'
+    }
     
     // Update package.json
     packageJson.scripts = scripts
     
     // Write back to file
     await writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n')
+    
+    console.log('✅ Updated init command to remove cleanup step')
     
   } catch (error) {
     console.error('❌ Failed to cleanup template commands:', error.message)
@@ -188,6 +173,25 @@ async function cleanupLicense(): Promise<void> {
   }
 }
 
+async function selfDelete(): Promise<void> {
+  const scriptPath = join(process.cwd(), 'deployment', 'scripts', 'cleanup-template.ts')
+  
+  try {
+    // Small delay to ensure the script finishes executing
+    setTimeout(async () => {
+      try {
+        await unlink(scriptPath)
+        console.log('🗑️  Cleanup script removed itself')
+      } catch (error) {
+        // Script might have already been deleted or doesn't exist
+        console.log('⚠️  Could not remove cleanup script:', error.message)
+      }
+    }, 100)
+  } catch (error) {
+    console.error('❌ Failed to schedule self-deletion:', error.message)
+  }
+}
+
 async function main(): Promise<void> {
   // First update package.json with project info
   // This changes the package name from "nuxtship" to the project name
@@ -201,6 +205,10 @@ async function main(): Promise<void> {
     await cleanupTemplateCommands()
     await cleanupReadme()
     await cleanupLicense()
+    
+    // Self-delete the cleanup script as the final step
+    await selfDelete()
+    
     console.log('🚀 Your project is ready for development!')
   }
 }
