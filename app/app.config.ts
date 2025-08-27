@@ -1,4 +1,7 @@
 export default defineAppConfig({
+  icon: {
+    cssLayer: 'components',
+  },
   ui: {
     colors: {
       primary: 'indigo',

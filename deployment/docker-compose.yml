@@ -2,7 +2,7 @@ name: ${PROJECT_NAME}
 
 services:
   traefik:
-    image: traefik:${TRAEFIK_VERSION:-v3.4.4}
+    image: traefik:${TRAEFIK_VERSION:-v3.5.0}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -31,9 +31,13 @@ services:
 
   zitadel:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION:-v3.3.1}
+    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION:-v4.0.3}
     command: 'start-from-init --masterkey "${ZITADEL_MASTERKEY}" --steps /config/init-steps.yaml'
     environment:
+      # Disable telemetry (anonymous metrics collection)
+      ZITADEL_TELEMETRY_ENABLED: false
+      # Disable Login v2 (use integrated Login v1)
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: false
       # Machine key and PAT paths for service account
       ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH: /machinekey/app-provisioner.json
       ZITADEL_FIRSTINSTANCE_PATPATH: /pat/app-provisioner.pat

@@ -36,7 +36,7 @@
           </i18n-t>
           <i18n-t keypath="p5" tag="p">
             <template #NuxtShip>
-              <a href="https://github.com/MichaelSchmidle/NuxtShip">NuxtShip</a>
+              <a href="https://www.nuxtship.dev">NuxtShip</a>
             </template>
           </i18n-t>
         </div>
