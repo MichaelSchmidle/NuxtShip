@@ -1,13 +1,13 @@
 /**
  * Middleware to set user context for Row Level Security
  * 
- * This middleware extracts the user ID from the OIDC session
+ * This middleware extracts the user ID from the Logto session
  * and sets it as a PostgreSQL session variable that RLS policies
  * can access via auth.user_id()
  */
 import { sql } from 'drizzle-orm'
 import { db } from '../utils/db'
-import { getAuthSession } from '../utils/auth'
+import { logtoEventHandler } from '#logto'
 
 export default defineEventHandler(async (event) => {
   // Only apply to API routes
@@ -16,9 +16,13 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    // Get user from OIDC session using nuxt-oidc-auth
-    const session = await getAuthSession(event)
-    const userId = session?.userInfo?.sub as string | undefined
+    // Initialize Logto event handler
+    const config = useRuntimeConfig(event)
+    await logtoEventHandler(event, config)
+    
+    // Get user from Logto session
+    const user = await event.context.logtoClient?.getIdTokenClaims()
+    const userId = user?.sub
 
     if (userId) {
       // Set the user ID in PostgreSQL session for RLS
@@ -28,10 +32,13 @@ export default defineEventHandler(async (event) => {
       
       // Store in event context for use in API routes
       event.context.userId = userId
-      event.context.user = session.userInfo
+      event.context.user = user
     }
   } catch (error) {
     // Log but don't fail - some routes might be public
-    console.error('Failed to set auth context:', error)
+    // This is expected when user is not authenticated
+    if (error.message !== 'Not authenticated.') {
+      console.error('Failed to set auth context:', error)
+    }
   }
 })

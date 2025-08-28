@@ -15,7 +15,7 @@ services:
       - --providers.docker=true
       - --providers.docker.endpoint=unix:///var/run/docker.sock
       - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=app-dev
+      - --providers.docker.network=${DOCKER_NETWORK:-nuxtship-dev}
       - --providers.file.directory=/etc/traefik/dynamic
       - --providers.file.watch=true
       - --api.dashboard=true
@@ -27,20 +27,14 @@ services:
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.service=api@internal"
 
-  zitadel:
-    volumes:
-      - ./zitadel/machinekey:/machinekey
-      - ./zitadel/pat:/pat
+  logto:
+    ports:
+      - "3001:3001"
+      - "3002:3002"
     environment:
-      ZITADEL_TLS_ENABLED: false
-    labels:
-      - "traefik.http.services.zitadel.loadbalancer.server.scheme=h2c"
+      # Disable SSL verification for internal requests (dev only - needed for self-signed certs)
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
 
   postgres:
     ports:
       - "${POSTGRES_HOST_PORT:-5432}:5432"
-
-
-networks:
-  app:
-    name: ${DOCKER_NETWORK:-app-dev}

@@ -10,32 +10,13 @@
     </template>
 
     <template #right>
-      <UDropdownMenu
-        :content="{ align: 'end' }"
-        :items="items"
-      >
-        <UAvatar
-          :alt="typeof user?.userInfo?.name === 'string'
-            ? user.userInfo.name
-            : undefined
-          "
-          class="cursor-pointer"
-        />
+      <UDropdownMenu :content="{ align: 'end' }" :items="items">
+        <UAvatar :alt="user.username" class="cursor-pointer" />
 
         <template #loggedInAs>
-          <UUser
-:avatar="{
-            alt:
-              typeof user?.userInfo?.name === 'string'
-                ? user.userInfo.name
-                : undefined,
-          }" :name="typeof user?.userInfo?.name === 'string'
-            ? user.userInfo.name
-            : undefined
-            " :description="typeof user?.userInfo?.email === 'string'
-              ? user.userInfo.email
-              : undefined
-              " />
+          <UUser :avatar="{
+            alt: user.username,
+          }" :name="user.username" :description="user.email" />
         </template>
       </UDropdownMenu>
     </template>
@@ -48,7 +29,9 @@ import type { DropdownMenuItem } from '#ui/types'
 
 const { locale, t } = useI18n()
 const config = useRuntimeConfig()
-const { user, logout } = useOidcAuth()
+const user = await useLogtoUser()
+const client = useLogtoClient()
+
 const colorMode = useColorMode()
 
 const lang = computed(() => locales[locale.value].code)
@@ -94,17 +77,16 @@ const items = computed<DropdownMenuItem[][]>(() => [
       icon: 'i-ph-user',
       label: t('account'),
       target: '_blank',
-      to: config.public.AUTH_DOMAIN
-        ? `https://${config.public.AUTH_DOMAIN}/ui/console/users/me`
+      to: config.public.ADMIN_DOMAIN
+        ? `https://${config.public.ADMIN_DOMAIN}`
         : '#',
+      // TODO: Replace with custom user profile page - Logto doesn't provide end-user profile UI
     },
     {
       class: 'cursor-pointer',
       icon: 'i-ph-sign-out',
       label: t('logout'),
-      onSelect: () => {
-        logout()
-      },
+      to: '/auth/sign-out',
     },
   ],
 ])

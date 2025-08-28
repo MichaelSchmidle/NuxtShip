@@ -43,8 +43,8 @@ const items = computed<NavigationMenuItem[][]>(() => [
       icon: 'i-ph-users',
       label: t('userManagement'),
       target: '_blank',
-      to: config.public.AUTH_DOMAIN
-        ? `https://${config.public.AUTH_DOMAIN}`
+      to: config.public.ADMIN_DOMAIN
+        ? `https://${config.public.ADMIN_DOMAIN}`
         : '#',
     },
   ],

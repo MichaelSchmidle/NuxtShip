@@ -5,18 +5,12 @@
  * belonging to the authenticated user thanks to RLS policies
  */
 import { db } from '../../utils/db'
-import { getAuthSession } from '../../utils/auth'
+import { requireAuth } from '../../utils/auth'
 import { notes } from '../../database/schema/notes'
 
 export default defineEventHandler(async (event) => {
-  // Check if user is authenticated
-  const session = await getAuthSession(event)
-  if (!session?.userInfo) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized'
-    })
-  }
+  // Check if user is authenticated (throws if not)
+  requireAuth(event)
 
   try {
     // Simple query - RLS automatically filters to user's notes only

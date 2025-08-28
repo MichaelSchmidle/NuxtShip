@@ -1,7 +1,0 @@
-# Zitadel configuration to prevent default instance conflicts
-DefaultInstance:
-  Enabled: false
-
-# Disable default localhost domain creation
-FirstInstance:
-  SkipDomainCreation: true

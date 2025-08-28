@@ -1,24 +1,9 @@
 /**
  * Authentication utilities for server-side code
  * 
- * Provides helper functions to get user session data from nuxt-oidc-auth
+ * Provides helper functions to work with Logto authentication
  */
 import type { H3Event } from 'h3'
-
-/**
- * Get user session from the event context
- * Note: This function dynamically imports getUserSession to avoid build-time issues
- */
-export async function getAuthSession(event: H3Event) {
-  try {
-    // Dynamic import using the correct export path
-    const sessionModule = await import('nuxt-oidc-auth/runtime/server/utils/session.js')
-    const session = await sessionModule.getUserSession(event)
-    return session
-  } catch {
-    return null
-  }
-}
 
 /**
  * Check if user is authenticated

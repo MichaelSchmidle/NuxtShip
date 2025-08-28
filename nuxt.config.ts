@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     locales: ['en'],
   },
   modules: [
+    '@logto/nuxt',
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
@@ -24,35 +25,17 @@ export default defineNuxtConfig({
     '@nuxt/ui-pro',
     '@nuxtjs/i18n',
     '@pinia/nuxt',
-    'nuxt-oidc-auth',
   ],
-  oidc: {
-    defaultProvider: 'zitadel',
-    providers: {
-      zitadel: {
-        authenticationScheme: 'none', // PKCE flow
-        authorizationUrl: '',
-        baseUrl: '',
-        clientId: '',
-        clientSecret: '', // PKCE flow
-        exposeAccessToken: true, // Enable access to tokens on server-side
-        logoutUrl: '',
-        logoutRedirectUri: '',
-        redirectUri: '',
-        responseType: 'code',
-        scope: ['openid', 'profile', 'email'],
-        tokenUrl: '',
-        userInfoUrl: '',
-      },
+  logto: {
+    fetchUserInfo: true,
+    pathnames: {
+      signIn: '/auth/sign-in',
+      signOut: '/auth/sign-out',
+      callback: '/auth/callback',
     },
-    session: {
-      automaticRefresh: true,
-      maxAge: 3600, // 1 hour session timeout
-      cookie: {
-        secure: true, // HTTPS with mkcert certificates
-        sameSite: 'lax',
-      },
-    },
+    postCallbackRedirectUri: '/',
+    postLogoutRedirectUri: '/auth/sign-in',
+    scopes: ['openid', 'profile', 'email'],
   },
   runtimeConfig: {
     public: {
@@ -61,6 +44,7 @@ export default defineNuxtConfig({
       VERSION: process.env.VERSION || 'Set VERSION in .env',
       APP_DOMAIN: process.env.APP_DOMAIN || 'Set APP_DOMAIN in .env',
       AUTH_DOMAIN: process.env.AUTH_DOMAIN || 'Set AUTH_DOMAIN in .env',
+      ADMIN_DOMAIN: process.env.ADMIN_DOMAIN || 'Set ADMIN_DOMAIN in .env',
       BUILD_YEAR: new Date().getFullYear().toString(),
       PROJECT_PATH: process.cwd(),
     },

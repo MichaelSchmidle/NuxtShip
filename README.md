@@ -80,9 +80,10 @@ my-awesome-app/
 ### Authentication Flow
 
 1. User visits your app
-2. Redirected to Zitadel for secure authentication
-3. PKCE flow ensures token security
+2. Redirected to Logto for secure authentication
+3. OAuth 2.0/OIDC flow ensures token security
 4. User returns with valid session
+5. Server-side sessions enable true SSR
 
 ## 🔍 Available Services
 
@@ -114,4 +115,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-Made with ❤️ and [Node.js](https://nodejs.org/), [Docker](https://www.docker.com/), [Bun](https://bun.sh/), [mkcert](https://mkcert.dev/), [Nuxt](https://nuxt.com/), [Traefik](https://traefik.io/), [Zitadel](https://zitadel.com/), [PostgreSQL](https://postgresql.org/), [Drizzle](https://orm.drizzle.team/), [Nuxt UI](https://ui.nuxt.com/), [nuxt-oidc-auth](https://nuxtoidc.cloud), and [Phosphor Icons](https://phosphoricons.com/).
+Made with ❤️ and [Node.js](https://nodejs.org/), [Docker](https://www.docker.com/), [Bun](https://bun.sh/), [mkcert](https://mkcert.dev/), [Nuxt](https://nuxt.com/), [Traefik](https://traefik.io/), [Logto](https://logto.io/), [PostgreSQL](https://postgresql.org/), [Drizzle](https://orm.drizzle.team/), [Nuxt UI](https://ui.nuxt.com/), [@logto/nuxt](https://github.com/logto-io/js/tree/master/packages/nuxt), and [Phosphor Icons](https://phosphoricons.com/).

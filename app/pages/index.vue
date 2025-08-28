@@ -7,16 +7,16 @@
           <p>{{ t('p1') }}</p>
           <i18n-t keypath="p2" tag="p">
             <template #module>
-              <code>nuxt-oidc-auth</code>
+              <code>@logto/nuxt</code>
             </template>
             <template #object>
               <code>user</code>
             </template>
             <template #composable>
-              <code>useOidcAuth</code>
+              <code>useLogtoUser</code>
             </template>
           </i18n-t>
-          <pre>const { user } = useOidcAuth()</pre>
+          <pre>const user = await useLogtoUser()</pre>
           <i18n-t keypath="p3" tag="p">
             <template #object>
               <code>user</code>
@@ -48,7 +48,12 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const config = useRuntimeConfig()
-const { user } = useOidcAuth()
+const user = await useLogtoUser()
+
+// Protected page - check authentication
+if (!user) {
+  await navigateTo('/auth/sign-in')
+}
 </script>
 
 <i18n lang="yaml">

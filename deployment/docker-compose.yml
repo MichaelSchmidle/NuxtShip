@@ -20,85 +20,62 @@ services:
       - --providers.docker=true
       - --providers.docker.endpoint=unix:///var/run/docker.sock
       - --providers.docker.exposedbydefault=false
-      - --providers.docker.network=app
+      - --providers.docker.network=${DOCKER_NETWORK:-nuxtship-dev}
       - --api.dashboard=false
       - --api.insecure=false
       - --log.level=WARN
     labels:
       - "traefik.enable=true"
     networks:
-      - app
+      - nuxtship
 
-  zitadel:
+  logto:
     restart: unless-stopped
-    image: ghcr.io/zitadel/zitadel:${ZITADEL_VERSION:-v4.0.3}
-    command: 'start-from-init --masterkey "${ZITADEL_MASTERKEY}" --steps /config/init-steps.yaml'
+    image: ghcr.io/logto-io/logto:${LOGTO_VERSION:-1.30.1}
+    entrypoint: sh -c "npm run cli db seed -- --swe && npm start"
+    extra_hosts:
+      - "${AUTH_DOMAIN}:host-gateway"
+      - "${ADMIN_DOMAIN}:host-gateway"
     environment:
-      # Disable telemetry (anonymous metrics collection)
-      ZITADEL_TELEMETRY_ENABLED: false
-      # Disable Login v2 (use integrated Login v1)
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: false
-      # Machine key and PAT paths for service account
-      ZITADEL_FIRSTINSTANCE_MACHINEKEYPATH: /machinekey/app-provisioner.json
-      ZITADEL_FIRSTINSTANCE_PATPATH: /pat/app-provisioner.pat
-      ZITADEL_DATABASE_POSTGRES_HOST: postgres
-      ZITADEL_DATABASE_POSTGRES_PORT: 5432
-      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
-      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: ${ZITADEL_DB_PASSWORD}
-      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
-      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: ${APP_DB_USER}
-      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: ${APP_DB_ADMIN_PASSWORD}
-      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
-      ZITADEL_EXTERNALSECURE: true
-      ZITADEL_EXTERNALDOMAIN: ${AUTH_DOMAIN}
-      ZITADEL_EXTERNALPORT: 443
-      # SMTP Configuration
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST: ${ZITADEL_SMTP_HOST}:${ZITADEL_SMTP_PORT}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER: ${ZITADEL_SMTP_USER}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD: ${ZITADEL_SMTP_PASSWORD}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS: ${ZITADEL_SMTP_TLS}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM: ${ZITADEL_SMTP_FROM}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME: ${ZITADEL_SMTP_FROMNAME}
-      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_REPLYTOADDRESS: ${ZITADEL_SMTP_REPLYTO}
-      # Admin User Configuration  
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: ${ZITADEL_ADMIN_USERNAME}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_FIRSTNAME: ${ZITADEL_ADMIN_FIRSTNAME}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_LASTNAME: ${ZITADEL_ADMIN_LASTNAME}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_NICKNAME: ${ZITADEL_ADMIN_NICKNAME}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_DISPLAYNAME: ${ZITADEL_ADMIN_DISPLAYNAME}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_ADDRESS: ${ZITADEL_ADMIN_EMAIL}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_EMAIL_VERIFIED: true
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: ${ZITADEL_ADMIN_PASSWORD}
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
-      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PREFERREDLANGUAGE: en
-      # Branding Configuration
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_PRIMARYCOLOR: "#615fff" # indigo-500
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_BACKGROUNDCOLOR: "#f5f5f4" # stone-100
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_WARNCOLOR: "#ff2056" # rose-500
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_FONTCOLOR: "#1c1917" # stone-900
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_PRIMARYCOLORDARK: "#7c86ff" # indigo-400
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_BACKGROUNDCOLORDARK: "#1c1917" # stone-900
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_WARNCOLORDARK: "#ff2056" # rose-400
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_FONTCOLORDARK: "#f5f5f4" # stone-100
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_HIDELOGINNAMESUFFIX: false # Allow users with different email domains
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_ERRORMSGPOPUP: false
-      ZITADEL_DEFAULTINSTANCE_LABELPOLICY_DISABLEWATERMARK: false # Keep Zitadel attribution
+      DB_URL: postgres://logto:${LOGTO_DB_PASSWORD}@postgres:5432/logto
+      ENDPOINT: https://${AUTH_DOMAIN}
+      ADMIN_ENDPOINT: https://${ADMIN_DOMAIN}
+      # Trust proxy headers from Traefik
+      TRUST_PROXY_HEADER: true
+      # Optional: SMTP configuration for email notifications
+      LOGTO_SMTP_HOST: ${LOGTO_SMTP_HOST:-}
+      LOGTO_SMTP_PORT: ${LOGTO_SMTP_PORT:-587}
+      LOGTO_SMTP_USER: ${LOGTO_SMTP_USER:-}
+      LOGTO_SMTP_PASSWORD: ${LOGTO_SMTP_PASSWORD:-}
+      LOGTO_SMTP_FROM: ${LOGTO_SMTP_FROM:-auth@nuxtship.dev}
+      LOGTO_SMTP_FROM_NAME: ${LOGTO_SMTP_FROMNAME:-NuxtShip}
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./zitadel/init-steps.yaml:/config/init-steps.yaml:ro
-      - zitadel-machinekey:/machinekey
-      - zitadel-pat:/pat
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.zitadel.rule=Host(`${AUTH_DOMAIN}`)"
-      - "traefik.http.routers.zitadel.entrypoints=websecure"
-      - "traefik.http.routers.zitadel.tls=true"
-      - "traefik.http.services.zitadel.loadbalancer.server.port=8080"
+      # Auth service (port 3001)
+      - "traefik.http.routers.logto-auth.rule=Host(`${AUTH_DOMAIN}`)"
+      - "traefik.http.routers.logto-auth.entrypoints=websecure"
+      - "traefik.http.routers.logto-auth.tls=true"
+      - "traefik.http.routers.logto-auth.service=logto-auth"
+      - "traefik.http.routers.logto-auth.middlewares=logto-auth-headers"
+      - "traefik.http.services.logto-auth.loadbalancer.server.port=3001"
+      # Admin console (port 3002)
+      - "traefik.http.routers.logto-admin.rule=Host(`${ADMIN_DOMAIN}`)"
+      - "traefik.http.routers.logto-admin.entrypoints=websecure"
+      - "traefik.http.routers.logto-admin.tls=true"
+      - "traefik.http.routers.logto-admin.service=logto-admin"
+      - "traefik.http.routers.logto-admin.middlewares=logto-admin-headers"
+      - "traefik.http.services.logto-admin.loadbalancer.server.port=3002"
+      # Middleware for auth service
+      - "traefik.http.middlewares.logto-auth-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.logto-auth-headers.headers.customrequestheaders.X-Forwarded-Host=${AUTH_DOMAIN}"
+      # Middleware for admin console
+      - "traefik.http.middlewares.logto-admin-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.logto-admin-headers.headers.customrequestheaders.X-Forwarded-Host=${ADMIN_DOMAIN}"
     networks:
-      - app
+      - nuxtship
 
   postgres:
     restart: unless-stopped
@@ -109,15 +86,15 @@ services:
       POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
       POSTGRES_DB: ${APP_DB_NAME}
       PGUSER: ${APP_DB_USER}
-      # Variables for init script (admin user and zitadel)
+      # Variables for init script (admin user and logto)
       POSTGRES_ADMIN_PASSWORD: ${APP_DB_ADMIN_PASSWORD}
-      ZITADEL_DB_USER: zitadel
-      ZITADEL_DB_PASSWORD: ${ZITADEL_DB_PASSWORD}
+      LOGTO_DB_USER: ${LOGTO_DB_USER}
+      LOGTO_DB_PASSWORD: ${LOGTO_DB_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/init-db.sh:/docker-entrypoint-initdb.d/20-init-databases.sh:ro
     networks:
-      - app
+      - nuxtship
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
       interval: 10s
@@ -127,10 +104,8 @@ services:
 
 volumes:
   postgres-data:
-  zitadel-machinekey:
-  zitadel-pat:
 
 networks:
-  app:
-    name: ${DOCKER_NETWORK:-app}
+  nuxtship:
+    name: ${DOCKER_NETWORK:-nuxtship-dev}
     driver: bridge
